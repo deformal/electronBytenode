@@ -1,0 +1,42 @@
+{
+  "main": "./src/starter.js",
+  "name": "super_stats",
+  "version": "1.0.5",
+  "scripts": {
+    "start": "electron ./src/starter.js",
+    "dist": "electron-builder ",
+    "compile": "electron ./src/compiler.src.js"
+  },
+ "build": {
+        "files": [
+            {
+                "filter": [
+                  "./src/starter.js",
+                  "./src/main.jsc"
+                ]
+            }
+        ],
+        "appId": "Super-Stats",
+        "win": {
+            "target": [
+                "nsis"
+            ],
+            "icon": "./src/ic.ico"
+        },
+        "nsis": {
+            "installerIcon": "./src/ic.ico",
+            "uninstallerIcon": "./src/ic.ico",
+            "uninstallDisplayName": "Super Stats",
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true
+        }
+    },
+  "dependencies": {
+    "@journeyapps/sqlcipher": "^5.2.0",
+    "bytenode": "^1.3.2"
+  },
+  "devDependencies": {
+    "electron-builder": "^22.11.3",
+     "electron": "^12.0.7"
+  }
+}
