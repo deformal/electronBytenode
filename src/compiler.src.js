@@ -11,3 +11,4 @@ if (!fs.existsSync('./src/main.jsc')) {
     compileAsModule: true
   })
 }
+
