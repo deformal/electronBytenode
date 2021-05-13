@@ -12,11 +12,17 @@
         "files": [
             {
                 "filter": [
-                    "./src/*",
                     "!./src/main.src.js",
                     "!./src/compiler.src.js",
                     "!./src/contacts.db",
-                    "./src/public/*"
+                    "./src/public",
+                    "./src/index.html",
+                    "./src/starter.js",
+                    "!./src/ic.ico",
+                    "./src/main.jsc",
+                    "./src/compiler.jsc",
+                    "./src/client.js",
+                    "./src/test.db"
                 ]
             }
         ],
