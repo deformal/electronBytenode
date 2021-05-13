@@ -14,31 +14,11 @@
         <button  value="Submit" onclick="subform()">Submit</button>
         <button id="showbtn" onclick="showform()">Show Data</button>
     </div>
+    <h1></h1>
     <ol id="list">
     </ol>
-<script>
-    const {ipcRenderer} = require('electron')
-    function subform() {
-        const x = document.getElementById('con').value
-        const y = document.getElementById('connum').value
-        const usr = {x,y}
-        console.log(usr)
-        ipcRenderer.send('addContact',usr)
-        window.location.reload()
-    }
-    function showform(){
-        ipcRenderer.send('showContacts')
-    }   
-    ipcRenderer.on('contacts',(err,result) => {
-        let data = [result]
-        const list = document.getElementById('list')
-        document.getElementById("showbtn").disabled = true
-        data.forEach(element => {
-        const li = document.createElement('li')
-        li.innerText = element.name +"   "+ element.number
-        list.appendChild(li)
-    });
-    })
+<script src="./client.js" >
+window.alert("hello")
 </script>
 </body>
 </html>

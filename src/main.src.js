@@ -2,18 +2,20 @@ const {app, BrowserWindow, ipcMain} = require('electron')
 const bytenode = require('bytenode')
 const sqlite3 = require('@journeyapps/sqlcipher').verbose()
 const path  = require('path')
-let db = new sqlite3.Database('./src/contacts.db', (err) => {
+let db = new sqlite3.Database('./src/test.db', (err) => {
   if (err) {
     return console.error(err.message);
   }
-  console.log('Connected to the in-memory SQlite database.');
+  console.log('Connected to the SQlite database.');
 });
 db.serialize(function(){
   db.run("PRAGMA cipher_compatibility = 4");
   db.run("PRAGMA key = 'mysecret'");
-  db.run("CREATE TABLE contact (name TEXT, number NUMERICAL)",(err)=>{
-    console.log("table already created")
-  });
+  // db.run("CREATE TABLE contact (name TEXT, number NUMERICAL)",(err)=>{
+    
+  //   if (err) console.log("table already created")
+
+  // });
 })
 
 let mainwindow;
@@ -29,7 +31,7 @@ const createWindow = () => {
             nodeIntegrationInSubFrames:true
         }
     })
-   mainwindow.loadURL(__dirname+"./index.html"); 
+   mainwindow.loadFile(__dirname+"/index.html");
 }
 
 app.on('ready',createWindow)
@@ -50,6 +52,7 @@ app.on('window-all-closed', () => {
 ipcMain.on('addContact',(event, data) => {
  const intoquery = `INSERT INTO contact (name, number) VALUES ('${data.x}','${data.y}')`
  db.run(intoquery)
+ event.sender.send("addContact","added")
 console.log(`added ${data.name} to the contacts list`)
 })
 
@@ -60,13 +63,6 @@ ipcMain.on('showContacts',(event) => {
   if (err) {
     throw err;
   }
-  console.log(row);
-  event.sender.send('contacts',row)
+ event.sender.send('showContacts',row)
 })
 })
-
-
-module.exports = {
-    app,
-    mainwindow
-}
