@@ -1,22 +1,30 @@
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../public/main.css">
     <title>Document</title>
-    <script defer src="./originalClient.js" ></script>
+    <script defer src="./originalClient.js"></script>
 </head>
+
 <body>
-      <h1>hey</h1>
-    <div class="formdiv" >
+    <h1>Welcome to the bytenode, sqlcipher & electorn trial app</h1>
+    <p id="msg" class="messages"></p>
+    <div class="firstDiv">
+        <label class="ex"> Submit & Show data to and form the sql db </label>
         <input type="text" placeholder="contact name" name="contatct" class="conn" id="con" value="">
-        <input type="text" placeholder="contact number" name="contactnum" class="conn" id="connum" value="" >
-        <button  value="Submit" onclick="subform()">Submit</button>
-        <button id="showbtn" onclick="showform()">Show Data</button>
-        <button id="btn" onclick="hey()">Basic msg</button>
+        <input type="text" placeholder="contact number" name="contactnum" class="conn" id="connum" value="">
+        <button id="createUser" onclick="subform()">Submit</button>
+        <button id="showbtn" onclick="showform()">Show Data from database</button>
+        <section class="data">
+            <ol id="list">
+            </ol>
+        </section>
     </div>
-    <ol id="list">
-    </ol>
+    <br>
+    <br>
 </body>
+
 </html>

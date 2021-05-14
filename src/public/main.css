@@ -6,7 +6,52 @@ body {
   place-items: center;
 }
 
-body .formdiv {
+body .ex {
+  color: #2b2e4a;
+  font-style: italic;
+}
+
+body .messages {
+  color: red;
+}
+
+body .firstdiv {
   text-align: center;
+}
+
+body .firstdiv input {
+  padding: 10px;
+  border: solid black 1px;
+  border-radius: 2px;
+}
+
+body .firstdiv button {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: black;
+  color: white;
+  -webkit-transition: background-color 500ms;
+  transition: background-color 500ms;
+}
+
+body .firstdiv button:hover {
+  background-color: #f21170;
+  color: white;
+  cursor: pointer;
+}
+
+body .firstdiv .data {
+  text-align: left;
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  margin-left: 28vw;
+  margin-right: 28vw;
+}
+
+body .firstdiv .data ol > li {
+  padding: 5px;
 }
 /*# sourceMappingURL=main.css.map */
