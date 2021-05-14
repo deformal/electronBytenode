@@ -2,6 +2,7 @@ const {app, BrowserWindow, ipcMain} = require('electron')
 const bytenode = require('bytenode')
 const sqlite3 = require('@journeyapps/sqlcipher').verbose()
 const path  = require('path')
+
 let db = new sqlite3.Database('test.db', (err) => {
   if (err) {
     return console.error(err.message);

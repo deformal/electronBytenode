@@ -1,2 +1,2 @@
 const bytenode = require('bytenode')
-require('./main.jsc')
+require(__dirname+'/main.jsc')
