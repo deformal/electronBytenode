@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const bytenode = require("bytenode");
 const sqlite3 = require("@journeyapps/sqlcipher").verbose();
 const path = require("path");
+const { Console } = require("console");
 
 let db = new sqlite3.Database("test.db", (err) => {
   if (err) {
@@ -13,17 +14,17 @@ db.serialize(function () {
   db.run("PRAGMA cipher_compatibility = 4");
   db.run("PRAGMA key = 'mysecret'");
   db.run(
-    "CREATE TABLE person (pid INTEGER NOT NULL UNIQUE ,name TEXT NOT NULL, PRIMARY KEY('pid' AUTOINCREMENT))",
+    "CREATE TABLE IF NOT EXISTS person (pid INTEGER NOT NULL UNIQUE ,name TEXT NOT NULL UNIQUE, PRIMARY KEY('pid' AUTOINCREMENT))",
     (err) => {
       if (err) console.log(err);
-      console.log("table person create");
+      console.log("Switched to table ----> person");
     }
   );
   db.run(
-    "CREATE TABLE phone (pid INTEGER NOT NULL UNIQUE ,phonenumber NUMERICAL NOT NULL UNIQUE, PRIMARY KEY('pid' AUTOINCREMENT) )",
+    "CREATE TABLE IF NOT EXISTS phone (pid INTEGER NOT NULL UNIQUE ,phonenumber NUMERICAL NOT NULL UNIQUE, PRIMARY KEY('pid' AUTOINCREMENT) )",
     (err) => {
       if (err) console.log(err);
-      console.log("table phone created");
+      console.log("Switched to table ------> phone");
     }
   );
 });
@@ -57,26 +58,34 @@ app.on("window-all-closed", () => {
 });
 
 ipcMain.on("addContacts", async (event, data) => {
-  const personinsert = `INSERT INTO person (name) VALUES ('${data.x}')`;
-  const contactinsert = `INSERT INTO phone (phonenumber) VALUES ('${data.y}')`;
-  db.run(personinsert);
-  db.run(contactinsert);
-  event.sender.send("addContact", "added");
-  console.log(`added ${data.x} with ${data.y} to the contacts list`);
+  const personinsert = `INSERT INTO person (name) VALUES ('${data.name}')`;
+  const contactinsert = `INSERT INTO phone (phonenumber) VALUES ('${data.number}')`;
+  console.log(data)
+  db.run(personinsert, (err)=>{
+   if(err) {
+     console.log(err);
+     event.sender.send("dberrors",err)
+   }
+   event.sender.send("addContact","added")
+  })
+  db.run(contactinsert, (err)=>{
+   if(err) {
+     console.log(err);
+     event.sender.send("dberrors",err)
+   }
+   event.sender.send("addContact","added")
+  })
 });
 
 ipcMain.on("showContacts", async (event) => {
   const query =
-    "CREATE VIEW persons AS SELECT name, phonenumber FROM person INNER JOIN phone ON phone.pid = person.pid";
-  const statement = db.exec(query, (err) => {
-    err ? console.log(err) : console.log("ok to go");
-  });
+    "CREATE VIEW IF NOT EXISTS  persons AS SELECT name, phonenumber FROM person INNER JOIN phone ON phone.pid = person.pid";
+  db.exec(query);
   const viewquery = `SELECT * FROM persons`;
   db.each(viewquery, (err, row) => {
-    err ? console.log(err) : event.sender.send("showContact", row);
-  });
-
-  ipcMain.on("fromhtml", async (event) => {
-    event.sender.send("fromserver", "hello");
+    if(err) console.log(err)
+    console.log('Select from persons ----> ok')
+    console.log(row)
+    event.sender.send("showContact", row);
   });
 });

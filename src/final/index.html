@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../public/main.css">
     <title>Document</title>
-    <script defer src="./originalClient.js"></script>
 </head>
 
 <body>
@@ -14,8 +13,8 @@
     <p id="msg" class="messages"></p>
     <div class="firstDiv">
         <label class="ex"> Submit & Show data to and form the sql db </label>
-        <input type="text" placeholder="contact name" name="contatct" class="conn" id="con" value="">
-        <input type="text" placeholder="contact number" name="contactnum" class="conn" id="connum" value="">
+        <input type="text" value="" placeholder="contact name" name="contatct" class="conn" id="con">
+        <input type="text" value="" placeholder="contact number" name="contactnum" class="conn" id="connum">
         <button id="createUser" onclick="subform()">Submit</button>
         <button id="showbtn" onclick="showform()">Show Data from database</button>
         <section class="data">
@@ -25,6 +24,7 @@
     </div>
     <br>
     <br>
+<script defer src="./originalClient.js"></script>
 </body>
 
 </html>

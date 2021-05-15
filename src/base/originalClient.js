@@ -1,19 +1,39 @@
 const { ipcRenderer } = require("electron");
+const Ajv = require("ajv");
+const ajv = new Ajv({ allErrors: true });
+require('ajv-keywords')(ajv,"transform")
+// schema
+const schmea = {
+  type: "object",
+  properties: {
+    name: { type: "string" },
+    number: { type: "number",},
+  },
+  required: ["name", "number"],
+  additionalProperties: false,
+};
+const validate = ajv.compile(schmea);
+
+//schema test functions
+function test(data) {
+  const valid = validate(data);
+  return valid ? true : false;
+}
+
 // client functions
 function subform() {
-  const x = document.getElementById("con").value;
-  const y = document.getElementById("connum").value;
+  const name = document.getElementById("con").value
+  const number = parseFloat(document.getElementById("connum").value)
   const message = document.getElementById("msg");
-  let usr;
-  if (x == "" || y == "") h1.innerText = "empty fields";
-  else {
-    message.innerText = "added";
-    usr = { x, y };
-    console.log(usr);
+  const usr = {name,number};
+  if (test(usr)) {
+    message.innerText = "The user is added"
     ipcRenderer.send("addContacts", usr);
     setTimeout(function () {
       window.location.reload();
-    }, 500);
+    }, 800);
+  } else {
+    message.innerText = `Invalid entry ${ajv.errorsText(validate.errors)}`
   }
 }
 
@@ -28,7 +48,7 @@ ipcRenderer.on("showContact", (err, result) => {
   const data = [result];
   data.forEach((element) => {
     let li = document.createElement("li");
-    li.innerText = element.name;
+    li.innerText = `Name:${element.name} ----- Phone:${element.phonenumber} `;
     list.appendChild(li);
   });
 });
@@ -43,3 +63,9 @@ ipcRenderer.on("fromserver", async (err, data) => {
   const x = document.querySelector("h1");
   x.innerText = data;
 });
+
+ipcRenderer.on("dberrors",(err,data)=>{
+  const message = document.getElementById("msg")
+   if(err) message.innerText = err
+   message.innerText = data
+})
