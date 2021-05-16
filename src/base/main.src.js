@@ -1,8 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
-const bytenode = require("bytenode");
 const sqlite3 = require("@journeyapps/sqlcipher").verbose();
-const path = require("path");
-const { Console } = require("console");
+const jsql = require("json-sql")();
 
 let db = new sqlite3.Database("test.db", (err) => {
   if (err) {
@@ -43,7 +41,9 @@ const createWindow = () => {
   mainwindow.loadFile(__dirname + "/index.html");
 };
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  createWindow();
+});
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
@@ -60,32 +60,36 @@ app.on("window-all-closed", () => {
 ipcMain.on("addContacts", async (event, data) => {
   const personinsert = `INSERT INTO person (name) VALUES ('${data.name}')`;
   const contactinsert = `INSERT INTO phone (phonenumber) VALUES ('${data.number}')`;
-  console.log(data)
-  db.run(personinsert, (err)=>{
-   if(err) {
-     console.log(err);
-     event.sender.send("dberrors",err)
-   }
-   event.sender.send("addContact","added")
-  })
-  db.run(contactinsert, (err)=>{
-   if(err) {
-     console.log(err);
-     event.sender.send("dberrors",err)
-   }
-   event.sender.send("addContact","added")
-  })
+  console.log(data);
+  db.run(personinsert, (err) => {
+    if (err) {
+      console.log(err);
+      event.sender.send("dberrors", err);
+    }
+    event.sender.send("addContact", "added");
+  });
+  db.run(contactinsert, (err) => {
+    if (err) {
+      console.log(err);
+      event.sender.send("dberrors", err);
+    }
+    event.sender.send("addContact", "added");
+  });
 });
 
-ipcMain.on("showContacts", async (event) => {
+ipcMain.on("showContacts", (event) => {
   const query =
     "CREATE VIEW IF NOT EXISTS  persons AS SELECT name, phonenumber FROM person INNER JOIN phone ON phone.pid = person.pid";
   db.exec(query);
-  const viewquery = `SELECT * FROM persons`;
-  db.each(viewquery, (err, row) => {
-    if(err) console.log(err)
-    console.log('Select from persons ----> ok')
-    console.log(row)
+  const sql = jsql.build({
+    type: "select",
+    table: "persons",
+  });
+  // const viewquery = `SELECT * FROM persons`;
+  db.each(sql.query, (err, row) => {
+    if (err) console.log(err);
+    console.log("Select from persons ----> ok");
+    console.log(row);
     event.sender.send("showContact", row);
   });
 });
