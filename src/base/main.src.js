@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, remote } = require("electron");
 const path = require("path");
 const sqlite3 = require("@journeyapps/sqlcipher").verbose();
 const jsql = require("json-sql")();
-const userDataPath = path.join(app.getPath("userData"), "test.db").toString();
+const userDataPath = path.join(app.getPath("userData"), "test.txt").toString();
 console.log(userDataPath);
 let db = new sqlite3.Database(userDataPath, (err) => {
   if (err) {
