@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const sqlite3 = require("@journeyapps/sqlcipher").verbose();
 const jsql = require("json-sql")();
 
-let db = new sqlite3.Database("test.db", (err) => {
+let db = new sqlite3.Database("./src/final/test.db", (err) => {
   if (err) {
     return console.error(err.message);
   }
@@ -85,11 +85,8 @@ ipcMain.on("showContacts", (event) => {
     type: "select",
     table: "persons",
   });
-  // const viewquery = `SELECT * FROM persons`;
   db.each(sql.query, (err, row) => {
     if (err) console.log(err);
-    console.log("Select from persons ----> ok");
-    console.log(row);
     event.sender.send("showContact", row);
   });
 });

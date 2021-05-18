@@ -35,6 +35,16 @@ body .firstdiv button {
   transition: background-color 500ms;
 }
 
+body .firstdiv button:disabled {
+  background-color: grey;
+  color: white;
+}
+
+body .firstdiv button:disabled:hover {
+  background-color: grey;
+  cursor: auto;
+}
+
 body .firstdiv button:hover {
   background-color: #f21170;
   color: white;

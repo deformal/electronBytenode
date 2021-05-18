@@ -1,13 +1,13 @@
 const { ipcRenderer } = require("electron");
 const Ajv = require("ajv");
 const ajv = new Ajv({ allErrors: true });
-require('ajv-keywords')(ajv,"transform")
+require("ajv-keywords")(ajv, "transform");
 // schema
 const schmea = {
   type: "object",
   properties: {
     name: { type: "string" },
-    number: { type: "number",},
+    number: { type: "number" },
   },
   required: ["name", "number"],
   additionalProperties: false,
@@ -22,31 +22,30 @@ function test(data) {
 
 // client functions
 function subform() {
-  const name = document.getElementById("con").value
-  const number = parseFloat(document.getElementById("connum").value)
+  const name = document.getElementById("con").value;
+  const number = parseFloat(document.getElementById("connum").value);
   const message = document.getElementById("msg");
-  const usr = {name,number};
+  const usr = { name, number };
   if (test(usr)) {
-    message.innerText = "The user is added"
+    message.innerText = "The user is added";
     ipcRenderer.send("addContacts", usr);
     setTimeout(function () {
       window.location.reload();
     }, 800);
   } else {
-    message.innerText = `Invalid entry ${ajv.errorsText(validate.errors)}`
+    message.innerText = `Invalid entry ${ajv.errorsText(validate.errors)}`;
   }
 }
 
 function showform() {
   ipcRenderer.send("showContacts");
-  const list = document.getElementById("list");
   document.getElementById("showbtn").disabled = true;
 }
 
 // ipc functions
 ipcRenderer.on("showContact", (err, result) => {
   const data = [result];
-  data.forEach((element) => {
+  data.map((element) => {
     let li = document.createElement("li");
     li.innerText = `Name:${element.name} ----- Phone:${element.phonenumber} `;
     list.appendChild(li);
@@ -64,8 +63,8 @@ ipcRenderer.on("fromserver", async (err, data) => {
   x.innerText = data;
 });
 
-ipcRenderer.on("dberrors",(err,data)=>{
-  const message = document.getElementById("msg")
-   if(err) message.innerText = err
-   message.innerText = data
-})
+ipcRenderer.on("dberrors", (err, data) => {
+  const message = document.getElementById("msg");
+  if (err) message.innerText = err;
+  message.innerText = data;
+});

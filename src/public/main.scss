@@ -2,48 +2,56 @@
 $fontfam: "Roboto Mono", monospace;
 
 body {
-    font-family: $fontfam;
-    display: grid;
-    place-items: center;
-    .ex {
-        color: #2b2e4a;
-        font-style: italic;
-    }
-    .messages {
-        color: red;
-    }
-    .firstdiv {
-        text-align: center;
+  font-family: $fontfam;
+  display: grid;
+  place-items: center;
+  .ex {
+    color: #2b2e4a;
+    font-style: italic;
+  }
+  .messages {
+    color: red;
+  }
+  .firstdiv {
+    text-align: center;
 
-        input {
-            padding: 10px;
-            border: solid black 1px;
-            border-radius: 2px;
-        }
-        button {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: black;
-            color: white;
-            transition: background-color 500ms;
-        }
-        button:hover {
-            background-color: #f21170;
-            color: white;
-            cursor: pointer;
-        }
-        .data {
-            text-align: left;
-            background-color: black;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            margin-left: 28vw;
-            margin-right: 28vw;
-            ol > li {
-                padding: 5px;
-            }
-        }
+    input {
+      padding: 10px;
+      border: solid black 1px;
+      border-radius: 2px;
     }
+    button {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: black;
+      color: white;
+      transition: background-color 500ms;
+    }
+    button:disabled {
+      background-color: grey;
+      color: white;
+    }
+    button:disabled:hover {
+      background-color: grey;
+      cursor: auto;
+    }
+    button:hover {
+      background-color: #f21170;
+      color: white;
+      cursor: pointer;
+    }
+    .data {
+      text-align: left;
+      background-color: black;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      margin-left: 28vw;
+      margin-right: 28vw;
+      ol > li {
+        padding: 5px;
+      }
+    }
+  }
 }
