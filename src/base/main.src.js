@@ -1,8 +1,10 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, remote } = require("electron");
+const path = require("path");
 const sqlite3 = require("@journeyapps/sqlcipher").verbose();
 const jsql = require("json-sql")();
-
-let db = new sqlite3.Database("./src/final/test.db", (err) => {
+const userDataPath = path.join(app.getPath("userData"), "test.db").toString();
+console.log(userDataPath);
+let db = new sqlite3.Database(userDataPath, (err) => {
   if (err) {
     return console.error(err.message);
   }
@@ -42,6 +44,7 @@ const createWindow = () => {
 };
 
 app.on("ready", () => {
+  console.log(app.getPath("appData"));
   createWindow();
 });
 

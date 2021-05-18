@@ -3,7 +3,7 @@
   "name": "super_stats",
   "version": "1.0.5",
   "scripts": {
-    "start": "electron ./src/final/starter.js",
+    "start": "electron . ./src/final/starter.js",
     "dist": "electron-builder",
     "compile": "electron ./src/final/compiler.src.js",
     "recompile": " rm -rf ./src/final/*.jsc && sleep 1 && electron ./src/final/compiler.src.js",
@@ -22,7 +22,7 @@
           "./src/final/main.jsc",
           "./src/final/index.html",
           "./src/public",
-          "./test.db"
+          "./src/final/test.db"
         ]
       }
     ],
