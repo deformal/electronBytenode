@@ -45,10 +45,9 @@ function showform() {
 
 // ipc functions
 ipcRenderer.on("showContact", (err, result) => {
-  const data = [result];
-  data.map((element) => {
+  result.map((element) => {
     let li = document.createElement("li");
-    li.innerText = `Name:${element.name} ----- Phone:${element.phonenumber} `;
+    li.innerText = `Name:${element.name} ----- Phone:${element.phone.phonenumber} `;
     list.appendChild(li);
   });
 });

@@ -2,49 +2,94 @@ const { app, BrowserWindow, ipcMain, remote } = require("electron");
 const path = require("path");
 const sqlite3 = require("@journeyapps/sqlcipher").verbose();
 const jsql = require("json-sql")();
-
-const userDataPath = path.join(app.getPath("userData"), "test.txt").toString();
-let db = new sqlite3.Database(userDataPath, (err) => {
-  if (err) {
-    return console.error(err.message);
+const { Sequelize, DataTypes, HasOne } = require("sequelize");
+const userDataPath = path
+  .join(app.getPath("userData"), "tables.sqlite")
+  .toString();
+const sequelize = new Sequelize(
+  "USERS",
+  "",
+  "mysecret",
+  {
+    dialect: "sqlite",
+    dialectModulePath: "@journeyapps/sqlcipher",
+    storage: userDataPath,
+  },
+  (err) => {
+    if (err) console.log(err);
+    else console.log("Connected to the db");
   }
-  console.log("Connected to the SQlite database.");
-});
-db.serialize(function () {
-  db.run("PRAGMA cipher_compatibility = 4");
-  db.run("PRAGMA key = 'mysecret'");
-  db.run(
-    "CREATE TABLE IF NOT EXISTS person (pid INTEGER NOT NULL UNIQUE ,name TEXT NOT NULL UNIQUE, PRIMARY KEY('pid' AUTOINCREMENT))",
-    (err) => {
-      if (err) console.log(err);
-      console.log("Switched to table ----> person");
-    }
-  );
-  db.run(
-    "CREATE TABLE IF NOT EXISTS phone (pid INTEGER NOT NULL UNIQUE ,phonenumber NUMERICAL NOT NULL UNIQUE, PRIMARY KEY('pid' AUTOINCREMENT) )",
-    (err) => {
-      if (err) console.log(err);
-      console.log("Switched to table ------> phone");
-    }
-  );
-});
+);
+// SQLCipher config
 
-let mainwindow;
+sequelize
+  .query("PRAGMA cipher_compatibility = 4")
+  .then((result) => {
+    console.log("Cipher Created");
+  })
+  .catch((err) => {
+    console.log("Some Error Occured");
+  }); // necessary
+sequelize
+  .query("PRAGMA key = 'mysecret'")
+  .then((result) => {
+    console.log("Cipher Created");
+  })
+  .catch((err) => {
+    console.log("Some Error Occured");
+  }); // necessary //necessary
 
-const createWindow = () => {
-  mainwindow = new BrowserWindow({
-    width: 500,
-    height: 500,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-    },
-  });
-  mainwindow.loadFile(__dirname + "/index.html");
-};
+const userName = sequelize.define("person", {
+  pid: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    autoIncrement: true,
+    unique: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+});
+const userPhone = sequelize.define("phone", {
+  pid: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    autoIncrement: true,
+    unique: true,
+    primaryKey: true,
+  },
+  phonenumber: {
+    type: DataTypes.NUMBER,
+    allowNull: false,
+    unique: true,
+  },
+});
+userName.hasOne(userPhone, { foreignKey: "pid" });
+userPhone.belongsTo(userName, { foreignKey: "pid" });
+(async () => {
+  await userName
+    .sync()
+    .then((result) => {
+      console.log("Table Created---> userName");
+    })
+    .catch((err) => {
+      console.log("Some Error Occured");
+    });
+  await userPhone
+    .sync()
+    .then((result) => {
+      console.log("Table Created---> userPhone");
+    })
+    .catch((err) => {
+      console.log("Some Error Occured");
+    });
+})();
 
 app.on("ready", () => {
-  mainwindow = new BrowserWindow({
+  let mainwindow = new BrowserWindow({
     width: 500,
     height: 500,
     alwaysOnTop: false,
@@ -54,9 +99,7 @@ app.on("ready", () => {
       contextIsolation: false,
     },
   });
-
-  // create a new `splash`-Window
-  splash = new BrowserWindow({
+  let splash = new BrowserWindow({
     width: 400,
     height: 400,
     center: true,
@@ -67,7 +110,6 @@ app.on("ready", () => {
   splash.loadFile(__dirname + "/splash.html");
   mainwindow.loadFile(__dirname + "/index.html");
 
-  // if main window is ready to show, then destroy the splash window and show up the main window
   mainwindow.once("ready-to-show", () => {
     splash.destroy();
     mainwindow.show();
@@ -87,35 +129,43 @@ app.on("window-all-closed", () => {
 });
 
 ipcMain.on("addContacts", async (event, data) => {
-  const personinsert = `INSERT INTO person (name) VALUES ('${data.name}')`;
-  const contactinsert = `INSERT INTO phone (phonenumber) VALUES ('${data.number}')`;
-  console.log(data);
-  db.run(personinsert, (err) => {
-    if (err) {
+  const newUserName = await userName
+    .create({
+      name: data.name,
+    })
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((err) => {
       console.log(err);
-      event.sender.send("dberrors", err);
-    }
-    event.sender.send("addContact", "added");
-  });
-  db.run(contactinsert, (err) => {
-    if (err) {
+    });
+  const newUserPhone = await userPhone
+    .create({
+      phonenumber: data.number,
+    })
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((err) => {
       console.log(err);
-      event.sender.send("dberrors", err);
-    }
-    event.sender.send("addContact", "added");
-  });
+    });
 });
 
-ipcMain.on("showContacts", (event) => {
-  const query =
-    "CREATE VIEW IF NOT EXISTS  persons AS SELECT name, phonenumber FROM person INNER JOIN phone ON phone.pid = person.pid";
-  db.exec(query);
-  const sql = jsql.build({
-    type: "select",
-    table: "persons",
-  });
-  db.each(sql.query, (err, row) => {
-    if (err) console.log(err);
-    event.sender.send("showContact", row);
-  });
+ipcMain.on("showContacts", async (event) => {
+  const allusers = await userName
+    .findAll({
+      include: {
+        model: userPhone,
+        required: true,
+        attributes: ["phonenumber"],
+      },
+    })
+    .then((result) => {
+      const body = JSON.stringify(result);
+      const final = JSON.parse(body);
+      event.sender.send("showContact", final);
+    })
+    .catch((err) => {
+      console.log(`this is the error ${err}`);
+    });
 });
