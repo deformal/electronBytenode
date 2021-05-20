@@ -2,8 +2,8 @@ const { app, BrowserWindow, ipcMain, remote } = require("electron");
 const path = require("path");
 const sqlite3 = require("@journeyapps/sqlcipher").verbose();
 const jsql = require("json-sql")();
+
 const userDataPath = path.join(app.getPath("userData"), "test.txt").toString();
-console.log(userDataPath);
 let db = new sqlite3.Database(userDataPath, (err) => {
   if (err) {
     return console.error(err.message);
@@ -44,8 +44,34 @@ const createWindow = () => {
 };
 
 app.on("ready", () => {
-  console.log(app.getPath("appData"));
-  createWindow();
+  mainwindow = new BrowserWindow({
+    width: 500,
+    height: 500,
+    alwaysOnTop: false,
+    show: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
+
+  // create a new `splash`-Window
+  splash = new BrowserWindow({
+    width: 400,
+    height: 400,
+    center: true,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+  });
+  splash.loadFile(__dirname + "/splash.html");
+  mainwindow.loadFile(__dirname + "/index.html");
+
+  // if main window is ready to show, then destroy the splash window and show up the main window
+  mainwindow.once("ready-to-show", () => {
+    splash.destroy();
+    mainwindow.show();
+  });
 });
 
 app.on("activate", () => {

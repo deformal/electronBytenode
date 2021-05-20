@@ -22,7 +22,8 @@
           "./src/final/main.jsc",
           "./src/final/index.html",
           "./src/public",
-          "./src/final/test.db"
+          "./src/final/test.db",
+          "./src/final/splash.html"
         ]
       }
     ],

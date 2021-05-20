@@ -2,6 +2,7 @@ const { ipcRenderer } = require("electron");
 const Ajv = require("ajv");
 const ajv = new Ajv({ allErrors: true });
 require("ajv-keywords")(ajv, "transform");
+
 // schema
 const schmea = {
   type: "object",
